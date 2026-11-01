@@ -18,6 +18,9 @@ set -euo pipefail
 # Derlemede `make dist` yerleştirir (ham 32 baytlık ed25519 açık anahtar, base64).
 PUBKEY_B64='fnZXF9YpHw0Kt005rAG0E1eJZxsWj9u3LAcMI5zD8uE='
 GITHUB_REPO='kadirsungurlu/sunucu-panel-dagitim'
+# Yalnız deneme için (sahte API sunucusu); sudo ortamı temizlediğinden normal kurulumu etkilemez.
+GITHUB_API="${SP_GITHUB_API:-https://api.github.com}"
+GITHUB_API="${GITHUB_API%/}"
 
 FROM=''
 VERSION=''
@@ -41,7 +44,7 @@ while [ $# -gt 0 ]; do
 done
 
 case "$PUBKEY_B64" in
-	@@*) hata "betik açık anahtar gömülmeden derlenmiş (make dist kullanın)" ;;
+	@@* | '') hata "İMZA ANAHTARI YOK: betik açık anahtar gömülmeden derlenmiş; imzasız kurulum yapılmaz (betiği 'make dist' çıktısından alın)" ;;
 esac
 
 if [ "$VERIFY_ONLY" -eq 0 ] && [ "$(id -u)" -ne 0 ]; then
@@ -95,21 +98,22 @@ fi
 ASSETS="$TMP/assets.txt"
 if [ "$SRC_KIND" = 'github' ]; then
 	if [ -n "$VERSION" ]; then
-		API="https://api.github.com/repos/$GITHUB_REPO/releases/tags/$VERSION"
+		API="$GITHUB_API/repos/$GITHUB_REPO/releases/tags/$VERSION"
 	else
-		API="https://api.github.com/repos/$GITHUB_REPO/releases/latest"
+		API="$GITHUB_API/repos/$GITHUB_REPO/releases/latest"
 	fi
 	"${CURL[@]}" "${AUTH[@]}" -H 'Accept: application/vnd.github+json' "$API" -o "$TMP/release.json" ||
 		hata "sürüm bilgisi alınamadı (API sınırı aşıldıysa --github-token-file verin): $API"
 	# Varlık listesi: "ad url" (url = API varlık adresi; octet-stream ile indirilir).
-	awk '
-		/"url": *"https:\/\/api\.github\.com\/repos\/[^"]*\/releases\/assets\/[0-9]+"/ {
+	# JSON tek satır (sıkıştırılmış) gelirse önce her alan ayrı satıra bölünür.
+	sed 's/,"/,\n"/g; s/{"/{\n"/g' "$TMP/release.json" | awk '
+		/"url": *"[^"]*\/repos\/[^"]*\/releases\/assets\/[0-9]+"/ {
 			u = $0; sub(/.*"url": *"/, "", u); sub(/".*/, "", u); next
 		}
 		/"name": *"/ && u != "" {
 			n = $0; sub(/.*"name": *"/, "", n); sub(/".*/, "", n); print n " " u; u = ""
 		}
-	' "$TMP/release.json" >"$ASSETS"
+	' >"$ASSETS"
 	[ -s "$ASSETS" ] || hata "sürümde varlık bulunamadı"
 fi
 
@@ -137,6 +141,11 @@ indir() {
 # imza_dogrula <dosya> <imza>: gömülü ed25519 açık anahtarıyla doğrular.
 imza_dogrula() {
 	local dosya="$1" imza="$2"
+	# ed25519 ham imza doğrulaması OpenSSL 3 (pkeyutl -rawin) ister.
+	case "$(openssl pkeyutl -help 2>&1)" in
+		*-rawin*) ;;
+		*) hata "openssl ed25519 doğrulamasını desteklemiyor (OpenSSL 3 gerekli; bu sistem: $(openssl version 2>/dev/null))" ;;
+	esac
 	# SubjectPublicKeyInfo DER öneki (ed25519) + 32 baytlık ham anahtar -> PEM.
 	{
 		printf '\x30\x2a\x30\x05\x06\x03\x2b\x65\x70\x03\x21\x00'
