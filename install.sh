@@ -61,11 +61,17 @@ case "$(uname -m)" in
 	*) hata "desteklenmeyen mimari: $(uname -m)" ;;
 esac
 
-if [ "$VERIFY_ONLY" -eq 0 ] && [ -r /etc/os-release ]; then
-	# shellcheck disable=SC1091
-	. /etc/os-release
-	if [ "${ID:-}" != "ubuntu" ] || [ "${VERSION_ID:-}" != "24.04" ]; then
-		printf 'UYARI: yalnız Ubuntu 24.04 denendi (bu sistem: %s %s)\n' "${ID:-?}" "${VERSION_ID:-?}" >&2
+# Yalnız deneme için (sahte os-release).
+OS_RELEASE="${SP_OS_RELEASE:-/etc/os-release}"
+if [ "$VERIFY_ONLY" -eq 0 ] && [ -r "$OS_RELEASE" ]; then
+	# Alt kabukta okunur: os-release VERSION/NAME gibi adlar tanımlar ve --version değerini ezerdi.
+	OS_KIMLIK="$(
+		# shellcheck disable=SC1090,SC1091
+		. "$OS_RELEASE"
+		printf '%s %s' "${ID:-?}" "${VERSION_ID:-?}"
+	)"
+	if [ "$OS_KIMLIK" != "ubuntu 24.04" ]; then
+		printf 'UYARI: yalnız Ubuntu 24.04 denendi (bu sistem: %s)\n' "$OS_KIMLIK" >&2
 	fi
 fi
 
