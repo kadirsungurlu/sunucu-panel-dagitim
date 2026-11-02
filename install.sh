@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# sunucu-panel kurulum önyükleyicisi (Ubuntu 24.04).
+# sunucu-panel kurulum önyükleyicisi (Ubuntu 24.04 / 26.04).
 #
 #   curl -fsSL <URL>/install.sh | sudo bash -s -- [önyükleme bayrakları] [--] [kurulum bayrakları]
 #
@@ -70,8 +70,8 @@ if [ "$VERIFY_ONLY" -eq 0 ] && [ -r "$OS_RELEASE" ]; then
 		. "$OS_RELEASE"
 		printf '%s %s' "${ID:-?}" "${VERSION_ID:-?}"
 	)"
-	if [ "$OS_KIMLIK" != "ubuntu 24.04" ]; then
-		printf 'UYARI: yalnız Ubuntu 24.04 denendi (bu sistem: %s)\n' "$OS_KIMLIK" >&2
+	if [ "$OS_KIMLIK" != "ubuntu 24.04" ] && [ "$OS_KIMLIK" != "ubuntu 26.04" ]; then
+		printf 'UYARI: yalnız Ubuntu 24.04 ve 26.04 denendi (bu sistem: %s)\n' "$OS_KIMLIK" >&2
 	fi
 fi
 
