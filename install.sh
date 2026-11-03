@@ -10,6 +10,8 @@
 #   --upgrade                 kurulum yerine yükseltme (sunucu-panel upgrade)
 #   --verify-only             yalnız imza + özet doğrula, kurma (root gerekmez)
 # Kalan bayraklar (ya da `--` sonrası her şey) `sunucu-panel install|upgrade`e aynen geçer.
+# Ana node varsayılan olarak kümenin ilk sunucusudur (application rolü, 80/443 sp-caddy'de);
+# kapatmak için --yalniz-panel, kotasız ajan için --kota-yok (/srv XFS prjquota değilse kendiliğinden).
 #
 # Güven zinciri: SHA256SUMS dosyası, bu betiğe derlemede gömülen ed25519 açık
 # anahtarıyla doğrulanır; sonra her dosya SHA256SUMS'a göre denetlenir.
