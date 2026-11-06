@@ -2,14 +2,14 @@
 
 Bu repo yalnız Sunucu Panel'in **imzalı sürüm dosyalarını** taşır: panel, ajan ve Caddy ikilileri (linux amd64/arm64), `SHA256SUMS`, `SHA256SUMS.sig` (ed25519) ve kurulum betikleri. Kaynak kod burada değil.
 
-Son sürüm: v0.7.32 (bkz. Releases).
+Son sürüm: v0.7.33 (bkz. Releases).
 
 ## Kurulum (Ubuntu 24.04 ya da 26.04, root)
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/kadirsungurlu/sunucu-panel-dagitim/main/install.sh -o install.sh
 bash install.sh                     # son sürüm, eksik bilgileri sorar
-bash install.sh --version v0.7.32 # belirli sürüm
+bash install.sh --version v0.7.33 # belirli sürüm
 bash install.sh --verify-only       # yalnız indir ve imzayı doğrula
 ```
 
