@@ -11,7 +11,8 @@
 #   --verify-only             yalnız imza + özet doğrula, kurma (root gerekmez)
 # Kalan bayraklar (ya da `--` sonrası her şey) `sunucu-panel install|upgrade`e aynen geçer.
 # Ana node varsayılan olarak kümenin ilk sunucusudur (application rolü, 80/443 sp-caddy'de);
-# kapatmak için --yalniz-panel, kotasız ajan için --kota-yok (/srv XFS prjquota değilse kendiliğinden).
+# kapatmak için --yalniz-panel, /srv için --srv-disk /dev/X [--bicimle] ya da --srv-boyut 50G, kotasız ajan için --kota-yok
+# (/srv hazır değilse ajan-kur.sh kendisi hazırlar; kök kotası yeniden başlatma isterse adımları yazar).
 #
 # Güven zinciri: SHA256SUMS dosyası, bu betiğe derlemede gömülen ed25519 açık
 # anahtarıyla doğrulanır; sonra her dosya SHA256SUMS'a göre denetlenir.
